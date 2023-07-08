@@ -1,5 +1,7 @@
 import { createApp } from 'vue';
-import './style.css';
+import './style/style.scss';
+import './svg.d';
 import App from './App.vue';
+import UUID from 'vue-uuid';
 
-createApp(App).mount('#app');
+createApp(App).use(UUID).mount('#app');

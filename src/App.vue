@@ -1,30 +1,42 @@
-<script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue';
-</script>
-
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-
-  <HelloWorld msg="Vite + Vue" />
+  <svg-sprite />
+  <congratulation-window>
+    <audio-wrapper>
+      <main-page>
+        <main-menu v-if="!page" :item="page" @click="clickMenuItem" />
+        <component v-else :is="pageComponent" />
+      </main-page>
+    </audio-wrapper>
+  </congratulation-window>
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
+<script lang="ts" setup>
+import AudioWrapper from '@/components/Audio/AudioWrapper.vue';
+import MainPage from '@/components/MainPage.vue';
+import { BACK_TO_MENU, MENU_PAGE_FIND_A_COUPLE, PAGE_STORAGE_NAME } from '@/const';
+import { MenuItem } from '@/types';
+import FindACouple from '@/view/FindACouple/FindACouple.vue';
+import MainMenu from '@/view/MainMenu.vue';
+import { computed, provide, ref } from 'vue';
+import CongratulationWindow from './components/CongratulationWindow.vue';
+import SvgSprite from './ui/SvgSprite.vue';
+
+const page = ref<MenuItem | null>(null);
+const pageComponent = computed<unknown | null>(() => (page.value === MENU_PAGE_FIND_A_COUPLE ? FindACouple : null));
+
+function clickMenuItem(item: MenuItem | null) {
+  page.value = item;
+  sessionStorage.setItem(PAGE_STORAGE_NAME, item ?? '');
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+
+provide(BACK_TO_MENU, () => {
+  clickMenuItem(null);
+});
+
+(() => {
+  const sessionPage = sessionStorage.getItem(PAGE_STORAGE_NAME) as MenuItem;
+  if (sessionPage) page.value = sessionPage;
+})();
+</script>
+
+<style lang="scss" scoped></style>
